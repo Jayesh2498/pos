@@ -14,3 +14,12 @@ dist-ssr
 .env
 
 .*.tsbuildinfo
+# Build cache
+tsconfig.*.tsbuildinfo
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Claude
+.claude/
