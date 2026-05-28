@@ -64,8 +64,8 @@ export default function CustomerBox({
       if (err) { setPhoneError(err); return }
     }
     setPhoneError('')
-    const fullPhone = digits ? `${country.dialCode} ${phone.trim()}` : ''
-    onLookup(fullPhone || phone)
+    // Pass the raw local number (digits only) — the DB stores phones without dial codes
+    onLookup(digits || phone.trim())
   }
 
   function handlePhoneChange(v: string) {

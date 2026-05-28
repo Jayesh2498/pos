@@ -15,6 +15,137 @@ const STORE_IDS = [
 const now = () => new Date().toISOString()
 const id = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
 
+// ── Cafe demo-data helpers ──────────────────────────────────────────────────
+const CAFE_SID = STORE_IDS[0]
+
+// Fixed customer UUIDs so order FK references are stable
+const CC1 = '10000000-cafe-0000-0000-000000000001' // Priya Sharma
+const CC2 = '10000000-cafe-0000-0000-000000000002' // Rahul Mehta
+const CC3 = '10000000-cafe-0000-0000-000000000003' // Ananya Singh
+const CC4 = '10000000-cafe-0000-0000-000000000004' // Vikram Nair
+const CC5 = '10000000-cafe-0000-0000-000000000005' // Sunita Patel
+const CC6 = '10000000-cafe-0000-0000-000000000006' // Arjun Kapoor
+const CC7 = '10000000-cafe-0000-0000-000000000007' // Meera Iyer
+
+/**
+ * ISO timestamp for `daysBack` days ago at `hour` o'clock in the browser's
+ * LOCAL timezone. Anchors to midnight so the result is always within the
+ * correct calendar day regardless of the user's timezone.
+ */
+const dayAt = (daysBack: number, hour = 10, minute = 0) => {
+  const d = new Date()
+  d.setDate(d.getDate() - daysBack)
+  d.setHours(hour, minute, 0, 0)
+  return d.toISOString()
+}
+// Keep tsAgo as an alias used by customer last_order_at
+const tsAgo = (daysBack: number, _hoursBack = 0) => dayAt(daysBack, 12)
+
+/** Round to 2 decimal places */
+const r2 = (n: number) => Math.round(n * 100) / 100
+
+/** Build a Cafe order + its order_items (5% exclusive tax, INR) */
+function cafeOrder(
+  ordId: string,
+  custId: string | null,
+  custName: string | null,
+  custPhone: string | null,
+  created_at: string,             // pre-computed ISO timestamp
+  items: [string, number, number][],  // [name, price, qty]
+  pay: string,
+  discPct = 0,
+): { order: Row; orderItems: Row[] } {
+  const subtotal   = r2(items.reduce((s, [, p, q]) => s + p * q, 0))
+  const discount   = r2(subtotal * discPct / 100)
+  const after      = r2(subtotal - discount)
+  const tax        = r2(after * 0.05)
+  const total      = r2(after + tax)
+  const num        = ordId.slice(-3).replace(/^0+/, '') || '1'
+  const order: Row = {
+    id: ordId, store_id: CAFE_SID,
+    customer_id: custId, customer_name: custName, customer_phone: custPhone,
+    order_number: `ORD-DEMO-${num.padStart(3, '0')}`,
+    subtotal, discount_amount: discount, tax_amount: tax, total_amount: total,
+    payment_method: pay, payment_status: 'paid', order_status: 'completed',
+    created_by: DEMO_USER_ID, created_at,
+  }
+  const orderItems: Row[] = items.map(([name, price, qty]) => ({
+    id: id(), order_id: ordId, product_id: null,
+    product_name_snapshot: name, price_snapshot: price,
+    quantity: qty, line_total: r2(price * qty), created_at,
+  }))
+  return { order, orderItems }
+}
+
+const _cafePairs = [
+  // ── TODAY (anchored to local calendar day so filters work in any timezone) ─
+  cafeOrder('20000000-cafe-0000-0000-000000000001', CC1,'Priya Sharma', '9876543210', dayAt(0, 9, 15),  [['Cappuccino',180,2],['Croissant',150,1]], 'upi'),
+  cafeOrder('20000000-cafe-0000-0000-000000000002', CC2,'Rahul Mehta',  '9123456789', dayAt(0,10, 30),  [['Espresso',120,1],['Chocolate Cookie',90,2]], 'cash'),
+  cafeOrder('20000000-cafe-0000-0000-000000000003', CC3,'Ananya Singh', '9988776655', dayAt(0,11, 45),  [['Iced Latte',220,1],['Avocado Toast',320,1]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000004', null, null, null,   dayAt(0,14,  0),  [['Espresso',120,1],['Blueberry Muffin',140,1]], 'cash'),
+  // ── YESTERDAY ──────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000005', CC5,'Sunita Patel', '9654321076', dayAt(1,10,  0),  [['Cappuccino',180,1],['Croissant',150,1],['Green Tea',120,1]], 'upi'),
+  cafeOrder('20000000-cafe-0000-0000-000000000006', CC4,'Vikram Nair',  '9765432108', dayAt(1,12, 30),  [['Veg Sandwich',260,1],['Sparkling Water',80,1]], 'cash'),
+  cafeOrder('20000000-cafe-0000-0000-000000000007', CC7,'Meera Iyer',   '9432107654', dayAt(1,15,  0),  [['Iced Latte',220,1],['Croissant',150,2]], 'card'),
+  // ── 2 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000008', CC1,'Priya Sharma', '9876543210', dayAt(2, 9,  0),  [['Espresso',120,2],['Avocado Toast',320,1]], 'upi'),
+  cafeOrder('20000000-cafe-0000-0000-000000000009', CC6,'Arjun Kapoor', '9543210765', dayAt(2,13, 45),  [['Cappuccino',180,1],['Chocolate Cookie',90,1]], 'cash'),
+  // ── 3 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000010', CC3,'Ananya Singh', '9988776655', dayAt(3,11,  0),  [['Veg Sandwich',260,2],['Sparkling Water',80,2]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000011', CC2,'Rahul Mehta',  '9123456789', dayAt(3,14, 20),  [['Green Tea',120,1],['Blueberry Muffin',140,2]], 'cash'),
+  // ── 4 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000012', CC5,'Sunita Patel', '9654321076', dayAt(4,10,  0),  [['Cappuccino',180,2],['Avocado Toast',320,1]], 'upi', 10),
+  cafeOrder('20000000-cafe-0000-0000-000000000013', CC4,'Vikram Nair',  '9765432108', dayAt(4,15, 30),  [['Espresso',120,1],['Croissant',150,1]], 'cash'),
+  // ── 5 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000014', CC1,'Priya Sharma', '9876543210', dayAt(5, 9, 30),  [['Iced Latte',220,2],['Croissant',150,1],['Chocolate Cookie',90,1]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000015', CC7,'Meera Iyer',   '9432107654', dayAt(5,12, 15),  [['Cappuccino',180,1],['Veg Sandwich',260,1]], 'upi'),
+  // ── 6 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000016', CC6,'Arjun Kapoor', '9543210765', dayAt(6,10, 45),  [['Espresso',120,1],['Avocado Toast',320,1]], 'cash'),
+  cafeOrder('20000000-cafe-0000-0000-000000000017', CC3,'Ananya Singh', '9988776655', dayAt(6,16,  0),  [['Blueberry Muffin',140,1],['Green Tea',120,1],['Sparkling Water',80,1]], 'upi'),
+  // ── 7 DAYS AGO ─────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000018', CC2,'Rahul Mehta',  '9123456789', dayAt(7,11, 30),  [['Cappuccino',180,1],['Croissant',150,1]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000019', CC5,'Sunita Patel', '9654321076', dayAt(7,13,  0),  [['Iced Latte',220,1],['Veg Sandwich',260,1]], 'cash'),
+  // ── 10 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000020', CC1,'Priya Sharma', '9876543210', dayAt(10, 9, 45), [['Avocado Toast',320,1],['Cappuccino',180,1]], 'upi'),
+  cafeOrder('20000000-cafe-0000-0000-000000000021', CC4,'Vikram Nair',  '9765432108', dayAt(10,14,  0), [['Espresso',120,2],['Chocolate Cookie',90,1]], 'cash'),
+  // ── 14 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000022', CC7,'Meera Iyer',   '9432107654', dayAt(14,10, 30), [['Cappuccino',180,1],['Avocado Toast',320,1]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000023', CC3,'Ananya Singh', '9988776655', dayAt(14,15, 15), [['Iced Latte',220,1],['Croissant',150,2]], 'upi'),
+  // ── 18 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000024', CC5,'Sunita Patel', '9654321076', dayAt(18, 9, 30), [['Veg Sandwich',260,1],['Cappuccino',180,1],['Green Tea',120,1]], 'cash'),
+  cafeOrder('20000000-cafe-0000-0000-000000000025', CC1,'Priya Sharma', '9876543210', dayAt(18,12,  0), [['Espresso',120,1],['Croissant',150,1],['Blueberry Muffin',140,1]], 'upi'),
+  // ── 22 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000026', CC2,'Rahul Mehta',  '9123456789', dayAt(22,11,  0), [['Cappuccino',180,2],['Avocado Toast',320,1]], 'card'),
+  cafeOrder('20000000-cafe-0000-0000-000000000027', CC6,'Arjun Kapoor', '9543210765', dayAt(22,14, 30), [['Iced Latte',220,1],['Veg Sandwich',260,1]], 'cash'),
+  // ── 26 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000028', CC7,'Meera Iyer',   '9432107654', dayAt(26,10,  0), [['Espresso',120,2],['Croissant',150,1]], 'upi'),
+  cafeOrder('20000000-cafe-0000-0000-000000000029', CC5,'Sunita Patel', '9654321076', dayAt(26,16, 15), [['Cappuccino',180,1],['Blueberry Muffin',140,1]], 'cash'),
+  // ── 28 DAYS AGO ────────────────────────────────────────────────────────────
+  cafeOrder('20000000-cafe-0000-0000-000000000030', CC1,'Priya Sharma', '9876543210', dayAt(28,13,  0), [['Iced Latte',220,1],['Avocado Toast',320,2],['Sparkling Water',80,1]], 'card', 5),
+]
+
+const _cafeOrders     = _cafePairs.map(p => p.order)
+const _cafeOrderItems = _cafePairs.flatMap(p => p.orderItems)
+
+// Pre-computed stats that match the orders above
+const _cafeCustomers: Row[] = [
+  { id:CC1, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Priya Sharma', phone:'9876543210', email:'priya@example.com', total_orders:6, total_spent:3730.65, last_order_at:dayAt(0,14),  created_by:DEMO_USER_ID, created_at:dayAt(28,9) },
+  { id:CC2, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Rahul Mehta',  phone:'9123456789', email:null,               total_orders:4, total_spent:1795.50, last_order_at:dayAt(0,10),  created_by:DEMO_USER_ID, created_at:dayAt(22,9) },
+  { id:CC3, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Ananya Singh', phone:'9988776655', email:'ananya@gmail.com',  total_orders:4, total_spent:2184.00, last_order_at:dayAt(0,11),  created_by:DEMO_USER_ID, created_at:dayAt(22,9) },
+  { id:CC4, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Vikram Nair',  phone:'9765432108', email:null,               total_orders:3, total_spent:987.00,  last_order_at:dayAt(1,12),  created_by:DEMO_USER_ID, created_at:dayAt(18,9) },
+  { id:CC5, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Sunita Patel', phone:'9654321076', email:'sunita@email.com',  total_orders:5, total_spent:2543.10, last_order_at:dayAt(1,10),  created_by:DEMO_USER_ID, created_at:dayAt(26,9) },
+  { id:CC6, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Arjun Kapoor', phone:'9543210765', email:null,               total_orders:3, total_spent:1249.50, last_order_at:dayAt(2,13),  created_by:DEMO_USER_ID, created_at:dayAt(22,9) },
+  { id:CC7, store_id:CAFE_SID, workspace_id:WORKSPACE_ID, crm_contact_id:null, name:'Meera Iyer',   phone:'9432107654', email:'meera@gmail.com',   total_orders:4, total_spent:1942.50, last_order_at:dayAt(1,15),  created_by:DEMO_USER_ID, created_at:dayAt(26,9) },
+]
+
+// ── Seed receipts for all cafe orders ──────────────────────────────────────
+const _cafeReceipts: Row[] = _cafeOrders.map((o, i) => ({
+  id: id(), order_id: o.id,
+  receipt_number: `REC-DEMO-${String(i + 1).padStart(3, '0')}`,
+  receipt_url: null, sent_via: 'none', sent_at: null,
+  created_at: o.created_at,
+}))
+
 const initialDb = (): Db => ({
   stores: [
     store(STORE_IDS[0], 'Cafe',               'Cafe / Coffee Shop', '☕', '#7C3AED', 'INR'),
@@ -154,10 +285,10 @@ const initialDb = (): Db => ({
     prd(STORE_IDS[5], 'Vim Dishwash Bar',    'KIR-015', 'Household',     35, 100, '4005003', '200g lemon fragrance',       'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&q=80'),
   ],
 
-  customers: [],
-  orders: [],
-  order_items: [],
-  receipts: [],
+  customers:   _cafeCustomers,
+  orders:      _cafeOrders,
+  order_items: _cafeOrderItems,
+  receipts:    _cafeReceipts,
 })
 
 // ── Helper factories ────────────────────────────────────────────────────
@@ -217,12 +348,12 @@ function prd(
   }
 }
 
-const DB_VERSION = 'v5'
+const DB_VERSION = 'v6'
 const DB_KEY = `retail-pos-local-db-${DB_VERSION}`
 
 function loadDb(): Db {
   // Clear legacy keys on version bump
-  for (const old of ['retail-pos-local-db', 'retail-pos-local-db-v2', 'retail-pos-local-db-v3', 'retail-pos-local-db-v4']) {
+  for (const old of ['retail-pos-local-db', 'retail-pos-local-db-v2', 'retail-pos-local-db-v3', 'retail-pos-local-db-v4', 'retail-pos-local-db-v5']) {
     localStorage.removeItem(old)
   }
   const raw = localStorage.getItem(DB_KEY)

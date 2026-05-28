@@ -2244,3 +2244,92 @@ body {
 
 /* ── Dashboard chart card ───────────────────────────────── */
 .dash-card { border-radius: 14px; background: var(--color-card); border: 1px solid var(--color-border); overflow: hidden; }
+
+/* ═══════════════════════════════════════════
+   MOBILE: ORDERS & CUSTOMERS 2-PANEL NAV
+═══════════════════════════════════════════ */
+
+/* Mobile back button (shared by Orders + Customers) */
+.ord-mobile-back {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 12px 16px;
+  border: none; border-bottom: 1px solid var(--color-border);
+  background: var(--color-card); color: var(--color-text-secondary);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  text-align: left; transition: background 0.15s;
+}
+.ord-mobile-back:hover { background: var(--color-bg); color: var(--color-primary); }
+
+@media (max-width: 768px) {
+  /* Orders: full-width single-panel navigation */
+  .ord-layout {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .ord-left {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+  }
+  .ord-list-scroll { max-height: 70vh; overflow-y: auto; }
+  .ord-right { width: 100%; overflow-y: visible; }
+
+  /* Customers: same single-panel pattern */
+  .cust-layout {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .cust-left {
+    width: 100% !important;
+    height: auto !important;
+    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+  }
+  .cust-list-scroll { max-height: 70vh; overflow-y: auto; }
+  .cust-right { width: 100%; overflow-y: visible; }
+
+  /* Condense order date pills */
+  .ord-date-pills { gap: 3px; }
+  .ord-date-pill  { padding: 3px 8px; font-size: 10px; }
+
+  /* Dashboard: header wraps cleanly */
+  .pos-page-header { flex-direction: column; align-items: stretch; gap: 10px; }
+  .dash-range-group { align-self: flex-start; }
+
+  /* Dashboard stat grid: 2 columns */
+  .dash-stat-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+  .dash-stat-card { padding: 12px; }
+  .dash-stat-value { font-size: 18px; }
+  .dash-stat-icon { width: 36px; height: 36px; border-radius: 10px; }
+
+  /* Products: narrower search, smaller cards */
+  .prd-search-wrap { min-width: 0 !important; }
+  .prd-toolbar { gap: 8px; }
+  .pg-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .pg-product-img-wrap { height: 90px !important; }
+
+  /* Settings: collapse appearance grid */
+  .stg-appearance-grid { grid-template-columns: 1fr !important; }
+
+  /* Store picker gap tweak */
+  .lp-grid { gap: 10px; }
+  .lp-hero-title { font-size: 22px; }
+
+  /* Make ord-detail-empty fill properly */
+  .ord-detail-empty { min-height: 30vh; }
+  .cust-detail-empty { min-height: 30vh; }
+}
+
+@media (max-width: 400px) {
+  .dash-stat-grid { grid-template-columns: 1fr !important; }
+  .pg-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .ord-mini-stats { flex-wrap: wrap; gap: 8px; }
+}
