@@ -31,7 +31,7 @@ export default function CustomerList({ customers, selectedId, onSelect }: Props)
           <div style={{ minWidth: 0 }}>
             <p className="cust-item-name">{c.name}</p>
             <p className="cust-item-meta">
-              {c.phone ?? c.email ?? 'No contact'} · {c.total_orders} orders
+              {c.phone ?? c.email ?? 'No contact'} · {c.total_orders} {c.total_orders === 1 ? 'order' : 'orders'}
             </p>
           </div>
         </div>

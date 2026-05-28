@@ -159,7 +159,7 @@ export default function Checkout() {
             loading={pg.loading}
             currency={store.currency}
             searchRef={pg.searchRef}
-            storeName="Retail POS"
+            storeName={store.store_name}
           />
         </div>
 

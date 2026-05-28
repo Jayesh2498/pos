@@ -149,7 +149,12 @@ export function useDashboard() {
         buckets[h].orders += 1
       }
       const currentHour = now.getHours()
-      setHourlyData(Object.values(buckets).slice(0, currentHour + 1))
+      const allHours = Object.values(buckets).slice(0, currentHour + 1)
+      // Trim leading empty hours: always show last 6 hrs, extend back to first order if earlier
+      const firstNonZero = allHours.findIndex((d: HourlySale) => d.revenue > 0)
+      const minStart = Math.max(0, currentHour - 5)
+      const start = firstNonZero >= 0 ? Math.min(firstNonZero, minStart) : minStart
+      setHourlyData(allHours.slice(start))
       setDailyData([])
     } else {
       const days = range === '7d' ? 7 : 30
