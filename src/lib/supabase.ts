@@ -4,12 +4,12 @@ type Db = Record<string, Row[]>
 const DEMO_USER_ID = '00000000-0000-0000-0000-000000000099'
 const WORKSPACE_ID = '00000000-0000-0000-0000-000000000010'
 const STORE_IDS = [
-  '00000000-0000-0000-0000-000000000001',
-  '00000000-0000-0000-0000-000000000002',
-  '00000000-0000-0000-0000-000000000003',
-  '00000000-0000-0000-0000-000000000004',
-  '00000000-0000-0000-0000-000000000005',
-  '00000000-0000-0000-0000-000000000006',
+  '00000000-0000-0000-0000-000000000001', // Cafe
+  '00000000-0000-0000-0000-000000000002', // Neon Bar
+  '00000000-0000-0000-0000-000000000003', // HealthPlus Pharmacy
+  '00000000-0000-0000-0000-000000000004', // Gizmo Hub
+  '00000000-0000-0000-0000-000000000005', // Urban Threads
+  '00000000-0000-0000-0000-000000000006', // Kirana Express
 ]
 
 const now = () => new Date().toISOString()
@@ -17,40 +17,154 @@ const id = () => crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
 
 const initialDb = (): Db => ({
   stores: [
-    store(STORE_IDS[0], 'Cafe', 'Cafe / Coffee Shop', '☕', '#7C3AED', 'INR'),
-    store(STORE_IDS[1], 'Neon Bar', 'Bar / Pub', '🍺', '#EF4444', 'USD'),
-    store(STORE_IDS[2], 'HealthPlus Pharmacy', 'Pharmacy', '💊', '#10B981', 'INR'),
-    store(STORE_IDS[3], 'Gizmo Hub', 'Electronics', '📱', '#0EA5E9', 'USD'),
-    store(STORE_IDS[4], 'Urban Threads', 'Clothing', '👕', '#EC4899', 'GBP'),
-    store(STORE_IDS[5], 'Kirana Express', 'Retail Store', '🏪', '#F59E0B', 'INR'),
+    store(STORE_IDS[0], 'Cafe',               'Cafe / Coffee Shop', '☕', '#7C3AED', 'INR'),
+    store(STORE_IDS[1], 'Neon Bar',            'Bar / Pub',          '🍺', '#EF4444', 'USD'),
+    store(STORE_IDS[2], 'HealthPlus Pharmacy', 'Pharmacy',           '💊', '#10B981', 'INR'),
+    store(STORE_IDS[3], 'Gizmo Hub',           'Electronics',        '📱', '#0EA5E9', 'USD'),
+    store(STORE_IDS[4], 'Urban Threads',        'Clothing',           '👕', '#EC4899', 'GBP'),
+    store(STORE_IDS[5], 'Kirana Express',       'Retail Store',       '🏪', '#F59E0B', 'INR'),
   ],
+
   categories: [
-    category('Coffee', '☕', '#7C3AED', 0),
-    category('Bakery', '🥐', '#F59E0B', 1),
-    category('Food', '🥪', '#10B981', 2),
-    category('Drinks', '🥤', '#0EA5E9', 3),
+    // ── Cafe ──────────────────────────────────────────────────────
+    cat(STORE_IDS[0], 'Coffee',  '☕', '#7C3AED', 0),
+    cat(STORE_IDS[0], 'Bakery',  '🥐', '#F59E0B', 1),
+    cat(STORE_IDS[0], 'Food',    '🥪', '#10B981', 2),
+    cat(STORE_IDS[0], 'Drinks',  '🥤', '#0EA5E9', 3),
+
+    // ── Neon Bar ──────────────────────────────────────────────────
+    cat(STORE_IDS[1], 'Cocktails',    '🍹', '#EF4444', 0),
+    cat(STORE_IDS[1], 'Beer & Cider', '🍺', '#F59E0B', 1),
+    cat(STORE_IDS[1], 'Wine',         '🍷', '#9F1239', 2),
+    cat(STORE_IDS[1], 'Spirits',      '🥃', '#92400E', 3),
+    cat(STORE_IDS[1], 'Bar Snacks',   '🍟', '#10B981', 4),
+
+    // ── HealthPlus Pharmacy ───────────────────────────────────────
+    cat(STORE_IDS[2], 'Medicines',     '💊', '#10B981', 0),
+    cat(STORE_IDS[2], 'Vitamins',      '🌿', '#84CC16', 1),
+    cat(STORE_IDS[2], 'Personal Care', '🧴', '#0EA5E9', 2),
+    cat(STORE_IDS[2], 'Baby Care',     '🍼', '#EC4899', 3),
+
+    // ── Gizmo Hub ─────────────────────────────────────────────────
+    cat(STORE_IDS[3], 'Audio',             '🎧', '#0EA5E9', 0),
+    cat(STORE_IDS[3], 'Accessories',       '🔌', '#6366F1', 1),
+    cat(STORE_IDS[3], 'Cables & Chargers', '🔋', '#F59E0B', 2),
+    cat(STORE_IDS[3], 'Gaming',            '🎮', '#EF4444', 3),
+
+    // ── Urban Threads ─────────────────────────────────────────────
+    cat(STORE_IDS[4], 'Tops',        '👕', '#EC4899', 0),
+    cat(STORE_IDS[4], 'Bottoms',     '👖', '#6366F1', 1),
+    cat(STORE_IDS[4], 'Outerwear',   '🧥', '#0EA5E9', 2),
+    cat(STORE_IDS[4], 'Accessories', '🧣', '#F59E0B', 3),
+
+    // ── Kirana Express ────────────────────────────────────────────
+    cat(STORE_IDS[5], 'Grains & Dal', '🌾', '#F59E0B', 0),
+    cat(STORE_IDS[5], 'Dairy & Eggs', '🥛', '#0EA5E9', 1),
+    cat(STORE_IDS[5], 'Snacks',       '🍿', '#EC4899', 2),
+    cat(STORE_IDS[5], 'Beverages',    '🥤', '#10B981', 3),
+    cat(STORE_IDS[5], 'Household',    '🧹', '#6366F1', 4),
   ],
+
   products: [
-    product('Espresso', 'CAF-001', 'Coffee', 120, 42, '8901001', 'Strong espresso shot', 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&q=80'),
-    product('Cappuccino', 'CAF-002', 'Coffee', 180, 28, '8901002', 'Steamed milk classic', 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80'),
-    product('Iced Latte', 'CAF-003', 'Coffee', 220, 18, '8901003', 'Chilled latte with ice', 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80'),
-    product('Croissant', 'BAK-001', 'Bakery', 150, 16, '8902001', 'Buttery flaky pastry', 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80'),
-    product('Blueberry Muffin', 'BAK-002', 'Bakery', 140, 9, '8902002', 'Fresh baked muffin', 'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=400&q=80'),
-    product('Veg Sandwich', 'FOO-001', 'Food', 260, 12, '8903001', 'Grilled veggie sandwich', 'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80'),
-    product('Chocolate Cookie', 'BAK-003', 'Bakery', 90, 4, '8902003', 'Chewy chocolate chip cookie', 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80'),
-    product('Sparkling Water', 'DRK-001', 'Drinks', 80, 35, '8904001', 'Chilled sparkling water', 'https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&q=80'),
-    product('Avocado Toast', 'FOO-002', 'Food', 320, 8, '8903002', 'Sourdough with fresh avocado', 'https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=400&q=80'),
-    product('Green Tea', 'DRK-002', 'Drinks', 120, 22, '8904002', 'Hot Japanese green tea', 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80'),
+    // ── Cafe ──────────────────────────────────────────────────────
+    prd(STORE_IDS[0], 'Espresso',       'CAF-001', 'Coffee',  120, 42, '8901001', 'Strong espresso shot',      'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&q=80'),
+    prd(STORE_IDS[0], 'Cappuccino',     'CAF-002', 'Coffee',  180, 28, '8901002', 'Steamed milk classic',      'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=400&q=80'),
+    prd(STORE_IDS[0], 'Iced Latte',     'CAF-003', 'Coffee',  220, 18, '8901003', 'Chilled latte with ice',    'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&q=80'),
+    prd(STORE_IDS[0], 'Croissant',      'BAK-001', 'Bakery',  150, 16, '8902001', 'Buttery flaky pastry',     'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80'),
+    prd(STORE_IDS[0], 'Blueberry Muffin','BAK-002','Bakery',  140,  9, '8902002', 'Fresh baked muffin',        'https://images.unsplash.com/photo-1607958996333-41aef7caefaa?w=400&q=80'),
+    prd(STORE_IDS[0], 'Veg Sandwich',   'FOO-001', 'Food',    260, 12, '8903001', 'Grilled veggie sandwich',   'https://images.unsplash.com/photo-1528735602780-2552fd46c7af?w=400&q=80'),
+    prd(STORE_IDS[0], 'Chocolate Cookie','BAK-003','Bakery',   90,  4, '8902003', 'Chewy chocolate chip cookie','https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=400&q=80'),
+    prd(STORE_IDS[0], 'Sparkling Water','DRK-001', 'Drinks',   80, 35, '8904001', 'Chilled sparkling water',   'https://images.unsplash.com/photo-1523362628745-0c100150b504?w=400&q=80'),
+    prd(STORE_IDS[0], 'Avocado Toast',  'FOO-002', 'Food',    320,  8, '8903002', 'Sourdough with fresh avocado','https://images.unsplash.com/photo-1541519227354-08fa5d50c820?w=400&q=80'),
+    prd(STORE_IDS[0], 'Green Tea',      'DRK-002', 'Drinks',  120, 22, '8904002', 'Hot Japanese green tea',    'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80'),
+
+    // ── Neon Bar ──────────────────────────────────────────────────
+    prd(STORE_IDS[1], 'Mojito',           'BAR-001', 'Cocktails',    12, 99, '9001001', 'Fresh mint & lime',          'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?w=400&q=80'),
+    prd(STORE_IDS[1], 'Margarita',        'BAR-002', 'Cocktails',    13, 99, '9001002', 'Classic salted rim',         'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&q=80'),
+    prd(STORE_IDS[1], 'Old Fashioned',    'BAR-003', 'Cocktails',    14, 99, '9001003', 'Whiskey & bitters',          'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=400&q=80'),
+    prd(STORE_IDS[1], 'Aperol Spritz',    'BAR-004', 'Cocktails',    12, 99, '9001004', 'Bubbly & bittersweet',       'https://images.unsplash.com/photo-1543253687-c931c8e01820?w=400&q=80'),
+    prd(STORE_IDS[1], 'Craft IPA',        'BAR-005', 'Beer & Cider',  8, 48, '9002001', 'Hoppy craft beer',           'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&q=80'),
+    prd(STORE_IDS[1], 'Draught Lager',    'BAR-006', 'Beer & Cider',  7, 60, '9002002', 'Crisp cold lager',           'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=400&q=80'),
+    prd(STORE_IDS[1], 'Apple Cider',      'BAR-007', 'Beer & Cider',  7, 30, '9002003', 'Chilled apple cider',        'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&q=80'),
+    prd(STORE_IDS[1], 'House Red Wine',   'BAR-008', 'Wine',          9, 40, '9003001', 'Full-bodied Merlot',         'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&q=80'),
+    prd(STORE_IDS[1], 'House White Wine', 'BAR-009', 'Wine',          9, 35, '9003002', 'Crisp Sauvignon Blanc',      'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400&q=80'),
+    prd(STORE_IDS[1], 'Whiskey Shot',     'BAR-010', 'Spirits',       7, 99, '9004001', 'Single malt or blend',       'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&q=80'),
+    prd(STORE_IDS[1], 'Vodka Soda',       'BAR-011', 'Spirits',      10, 99, '9004002', 'Clean & refreshing',         'https://images.unsplash.com/photo-1544145945-f90425340c7e?w=400&q=80'),
+    prd(STORE_IDS[1], 'Loaded Nachos',    'BAR-012', 'Bar Snacks',   11, 20, '9005001', 'Cheese, jalapeño & salsa',   'https://images.unsplash.com/photo-1513456852971-30c0b8199d4d?w=400&q=80'),
+    prd(STORE_IDS[1], 'Chicken Wings',    'BAR-013', 'Bar Snacks',   13, 18, '9005002', '6-piece spicy wings',        'https://images.unsplash.com/photo-1527477396000-e27163b481c2?w=400&q=80'),
+    prd(STORE_IDS[1], 'Fries & Dip',      'BAR-014', 'Bar Snacks',    7, 25, '9005003', 'Crispy fries with aioli',    'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80'),
+
+    // ── HealthPlus Pharmacy ───────────────────────────────────────
+    prd(STORE_IDS[2], 'Paracetamol 500mg',  'PHR-001', 'Medicines',      25, 200, '7001001', 'Pack of 10 tablets',         'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=400&q=80'),
+    prd(STORE_IDS[2], 'Cough Syrup 100ml',  'PHR-002', 'Medicines',      95,  80, '7001002', 'Relieves dry cough',         'https://images.unsplash.com/photo-1550572017-edd951b55104?w=400&q=80'),
+    prd(STORE_IDS[2], 'Antacid Tablets',    'PHR-003', 'Medicines',      55, 120, '7001003', 'Fast acid relief',           'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&q=80'),
+    prd(STORE_IDS[2], 'Bandage Roll',       'PHR-004', 'Medicines',      65,  90, '7001004', '5cm × 4m crepe bandage',     'https://images.unsplash.com/photo-1603398938378-e54eab446dde?w=400&q=80'),
+    prd(STORE_IDS[2], 'Vitamin C 1000mg',   'PHR-005', 'Vitamins',      180,  60, '7002001', 'Effervescent tablets × 20',  'https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?w=400&q=80'),
+    prd(STORE_IDS[2], 'Multivitamin',        'PHR-006', 'Vitamins',      320,  45, '7002002', 'Daily nutrition pack × 30', 'https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=400&q=80'),
+    prd(STORE_IDS[2], 'Omega-3 Fish Oil',   'PHR-007', 'Vitamins',      450,  30, '7002003', 'Heart & brain health',       'https://images.unsplash.com/photo-1628771065518-0d82f1938462?w=400&q=80'),
+    prd(STORE_IDS[2], 'Hand Sanitizer',     'PHR-008', 'Personal Care',  85, 150, '7003001', '70% alcohol, 100ml',         'https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=400&q=80'),
+    prd(STORE_IDS[2], 'Sunscreen SPF50',    'PHR-009', 'Personal Care', 395,  40, '7003002', 'Broad spectrum, 75ml',       'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&q=80'),
+    prd(STORE_IDS[2], 'Digital Thermometer','PHR-010', 'Personal Care', 280,  25, '7003003', 'Fast-read 10-sec result',    'https://images.unsplash.com/photo-1584820927498-cfe5211fd8bf?w=400&q=80'),
+    prd(STORE_IDS[2], 'Baby Diapers S (20)','PHR-011', 'Baby Care',     550,  35, '7004001', 'Soft & leak-proof, size S',  'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=400&q=80'),
+    prd(STORE_IDS[2], 'Baby Wipes (80ct)',  'PHR-012', 'Baby Care',     185,  50, '7004002', 'Fragrance-free & gentle',    'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=400&q=80'),
+
+    // ── Gizmo Hub ─────────────────────────────────────────────────
+    prd(STORE_IDS[3], 'Wireless Earbuds',   'GIZ-001', 'Audio',             49, 30, '6001001', 'True wireless, 24h battery', 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&q=80'),
+    prd(STORE_IDS[3], 'Bluetooth Speaker',  'GIZ-002', 'Audio',             45, 22, '6001002', 'Waterproof, 12h playback',   'https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&q=80'),
+    prd(STORE_IDS[3], 'Over-Ear Headphones','GIZ-003', 'Audio',             89, 15, '6001003', 'Active noise cancellation',  'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80'),
+    prd(STORE_IDS[3], 'Phone Case Universal','GIZ-004','Accessories',       15, 80, '6002001', 'Slim TPU, fits most phones', 'https://images.unsplash.com/photo-1601784551446-20c9e07cdbdb?w=400&q=80'),
+    prd(STORE_IDS[3], 'Screen Protector',   'GIZ-005', 'Accessories',        8, 60, '6002002', '9H tempered glass',          'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&q=80'),
+    prd(STORE_IDS[3], 'Car Phone Mount',    'GIZ-006', 'Accessories',       18, 35, '6002003', 'Universal magnetic mount',   'https://images.unsplash.com/photo-1582560475093-ba66accbc424?w=400&q=80'),
+    prd(STORE_IDS[3], 'USB-C Cable 2m',     'GIZ-007', 'Cables & Chargers', 12, 100,'6003001', 'Braided, fast charge 60W',  'https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=400&q=80'),
+    prd(STORE_IDS[3], 'Portable Charger',   'GIZ-008', 'Cables & Chargers', 35, 28, '6003002', '20 000 mAh, dual USB-A',     'https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&q=80'),
+    prd(STORE_IDS[3], 'GaN Charger 65W',    'GIZ-009', 'Cables & Chargers', 29, 20, '6003003', 'Compact 3-port PD charger',  'https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=400&q=80'),
+    prd(STORE_IDS[3], 'Gaming Mouse',       'GIZ-010', 'Gaming',            29, 18, '6004001', '12 000 DPI, RGB lighting',   'https://images.unsplash.com/photo-1527814050087-3793815479db?w=400&q=80'),
+    prd(STORE_IDS[3], 'Mechanical Keyboard','GIZ-011', 'Gaming',            79, 10, '6004002', 'TKL, Blue switches, RGB',    'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=400&q=80'),
+    prd(STORE_IDS[3], 'SD Card 128GB',      'GIZ-012', 'Accessories',       22, 50, '6002004', 'UHS-I Class 10, 100MB/s',    'https://images.unsplash.com/photo-1602526213897-7659b8b5abc3?w=400&q=80'),
+
+    // ── Urban Threads ─────────────────────────────────────────────
+    prd(STORE_IDS[4], 'Classic White Tee',  'UTH-001', 'Tops',       15, 50, '5001001', '100% organic cotton',        'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&q=80'),
+    prd(STORE_IDS[4], 'Graphic Print Tee',  'UTH-002', 'Tops',       18, 35, '5001002', 'Oversized street-style fit', 'https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&q=80'),
+    prd(STORE_IDS[4], 'Cropped Hoodie',     'UTH-003', 'Tops',       38, 25, '5001003', 'Soft fleece, relaxed fit',   'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=400&q=80'),
+    prd(STORE_IDS[4], 'Linen Shirt',        'UTH-004', 'Tops',       42, 20, '5001004', 'Breathable, button-down',    'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400&q=80'),
+    prd(STORE_IDS[4], 'Slim Fit Jeans',     'UTH-005', 'Bottoms',    45, 30, '5002001', 'Stretch denim, indigo wash', 'https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&q=80'),
+    prd(STORE_IDS[4], 'Chino Shorts',       'UTH-006', 'Bottoms',    28, 40, '5002002', 'Mid-rise, 7" inseam',        'https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=400&q=80'),
+    prd(STORE_IDS[4], 'Jogger Pants',       'UTH-007', 'Bottoms',    32, 22, '5002003', 'Tapered, elastic waistband', 'https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=400&q=80'),
+    prd(STORE_IDS[4], 'Bomber Jacket',      'UTH-008', 'Outerwear',  75, 15, '5003001', 'Satin-finish varsity style', 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80'),
+    prd(STORE_IDS[4], 'Trench Coat',        'UTH-009', 'Outerwear',  95, 10, '5003002', 'Double-breasted, belted',    'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&q=80'),
+    prd(STORE_IDS[4], 'Knit Scarf',         'UTH-010', 'Accessories',22, 45, '5004001', 'Chunky wool blend',          'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?w=400&q=80'),
+    prd(STORE_IDS[4], 'Beanie Hat',         'UTH-011', 'Accessories',16, 55, '5004002', 'Ribbed cuff, unisex',        'https://images.unsplash.com/photo-1575428652377-a2d80e2277fc?w=400&q=80'),
+    prd(STORE_IDS[4], 'Canvas Tote Bag',    'UTH-012', 'Accessories',20, 40, '5004003', 'Heavyweight 12oz canvas',    'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&q=80'),
+
+    // ── Kirana Express ────────────────────────────────────────────
+    prd(STORE_IDS[5], 'Basmati Rice 5kg',   'KIR-001', 'Grains & Dal', 320, 40, '4001001', 'Long grain, aged 2 years',   'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400&q=80'),
+    prd(STORE_IDS[5], 'Toor Dal 1kg',        'KIR-002', 'Grains & Dal', 145, 60, '4001002', 'Premium yellow lentils',     'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400&q=80'),
+    prd(STORE_IDS[5], 'Whole Wheat Atta 5kg','KIR-003', 'Grains & Dal', 215, 35, '4001003', 'Stone-ground, fortified',    'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400&q=80'),
+    prd(STORE_IDS[5], 'Chana Dal 1kg',       'KIR-004', 'Grains & Dal', 130, 55, '4001004', 'Split chickpeas, high protein','https://images.unsplash.com/photo-1515543904379-3d757afe72e4?w=400&q=80'),
+    prd(STORE_IDS[5], 'Full Cream Milk 1L',  'KIR-005', 'Dairy & Eggs',  68, 80, '4002001', 'Pasteurised, 3.5% fat',      'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80'),
+    prd(STORE_IDS[5], 'Amul Butter 500g',    'KIR-006', 'Dairy & Eggs', 285, 30, '4002002', 'Salted, pasteurised cream',  'https://images.unsplash.com/photo-1589985270958-2dc7f1a6a1e4?w=400&q=80'),
+    prd(STORE_IDS[5], 'Eggs (12 pcs)',        'KIR-007', 'Dairy & Eggs',  90, 50, '4002003', 'Farm fresh, large size',     'https://images.unsplash.com/photo-1506976785307-8732e854ad03?w=400&q=80'),
+    prd(STORE_IDS[5], "Lay's Classic Salted",'KIR-008', 'Snacks',        20, 120,'4003001', '26g packet',                 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=400&q=80'),
+    prd(STORE_IDS[5], 'Maggi 2-Minute Noodles','KIR-009','Snacks',       14, 150,'4003002', 'Masala flavour, 70g',        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=400&q=80'),
+    prd(STORE_IDS[5], 'Haldiram Bhujia',     'KIR-010', 'Snacks',        85,  70, '4003003', 'Crispy sev mix, 400g',       'https://images.unsplash.com/photo-1606756790138-261d2b21cd75?w=400&q=80'),
+    prd(STORE_IDS[5], 'Coca-Cola 2L',        'KIR-011', 'Beverages',     95,  45, '4004001', 'Chilled sparkling cola',     'https://images.unsplash.com/photo-1567103472667-6898f3a79cf2?w=400&q=80'),
+    prd(STORE_IDS[5], 'Frooti Mango 1L',     'KIR-012', 'Beverages',     55,  60, '4004002', 'Tropicana mango drink',      'https://images.unsplash.com/photo-1623594803397-a07ee68c4f88?w=400&q=80'),
+    prd(STORE_IDS[5], 'Surf Excel 1kg',      'KIR-013', 'Household',    180,  40, '4005001', 'Matic top-load detergent',   'https://images.unsplash.com/photo-1582735689369-4fe89db7114c?w=400&q=80'),
+    prd(STORE_IDS[5], 'Colgate Toothpaste',  'KIR-014', 'Household',     75,  90, '4005002', 'Strong teeth, 200g',         'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?w=400&q=80'),
+    prd(STORE_IDS[5], 'Vim Dishwash Bar',    'KIR-015', 'Household',     35, 100, '4005003', '200g lemon fragrance',       'https://images.unsplash.com/photo-1563453392212-326f5e854473?w=400&q=80'),
   ],
+
   customers: [],
   orders: [],
   order_items: [],
   receipts: [],
 })
 
-function store(id: string, store_name: string, store_type: string, icon: string, color: string, currency: string) {
+// ── Helper factories ────────────────────────────────────────────────────
+
+function store(storeId: string, store_name: string, store_type: string, icon: string, color: string, currency: string) {
   return {
-    id,
+    id: storeId,
     workspace_id: WORKSPACE_ID,
     store_name,
     currency,
@@ -68,11 +182,11 @@ function store(id: string, store_name: string, store_type: string, icon: string,
   }
 }
 
-function category(name: string, icon: string, color: string, sort_order: number) {
+function cat(storeId: string, name: string, icon: string, color: string, sort_order: number) {
   return {
     id: id(),
     workspace_id: WORKSPACE_ID,
-    store_id: STORE_IDS[0],
+    store_id: storeId,
     name,
     color,
     icon,
@@ -81,10 +195,15 @@ function category(name: string, icon: string, color: string, sort_order: number)
   }
 }
 
-function product(name: string, sku: string, category: string, price: number, stock_quantity: number, barcode: string, description: string, image_url?: string) {
+function prd(
+  storeId: string,
+  name: string, sku: string, category: string,
+  price: number, stock_quantity: number, barcode: string,
+  description: string, image_url?: string,
+) {
   return {
     id: id(),
-    store_id: STORE_IDS[0],
+    store_id: storeId,
     name,
     sku,
     category,
@@ -98,28 +217,14 @@ function product(name: string, sku: string, category: string, price: number, sto
   }
 }
 
-function customer(name: string, phone: string, email: string, total_orders: number, total_spent: number, crm_contact_id: string | null) {
-  return {
-    id: id(),
-    store_id: STORE_IDS[0],
-    crm_contact_id,
-    name,
-    phone,
-    email,
-    total_orders,
-    total_spent,
-    last_order_at: null,
-    created_at: now(),
-    created_by: DEMO_USER_ID,
-  }
-}
-
-const DB_VERSION = 'v4'
+const DB_VERSION = 'v5'
 const DB_KEY = `retail-pos-local-db-${DB_VERSION}`
 
 function loadDb(): Db {
   // Clear legacy keys on version bump
-  localStorage.removeItem('retail-pos-local-db')
+  for (const old of ['retail-pos-local-db', 'retail-pos-local-db-v2', 'retail-pos-local-db-v3', 'retail-pos-local-db-v4']) {
+    localStorage.removeItem(old)
+  }
   const raw = localStorage.getItem(DB_KEY)
   if (!raw) {
     const db = initialDb()
